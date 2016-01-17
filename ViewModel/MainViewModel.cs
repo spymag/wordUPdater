@@ -473,34 +473,42 @@ namespace WordUpdater.ViewModel
 
             using (ZipArchive archive = ZipFile.Open(zipPath_, ZipArchiveMode.Update))
             {
+            int flag = 0;
                 foreach (ZipArchiveEntry entry in archive.Entries)
                 {
-                    //renames file to be copied in zip to the corresponding file into the zip
-                    if (entry.Name.Equals("image"+imageNR.ToString() + ".png"))
-                    //if (entry.FullName.EndsWith(imageNR.ToString() + ".png"))
+                    
+                    if (entry.Name.EndsWith(imageNR.ToString() + ".epf")) // pick the correct
                     {
-                        entry.Delete();
-                        archive.CreateEntryFromFile(image, "word\\media\\image" + imageNR.ToString() + ".png");
-                        break; // exits the loop otherwise the collection number is changing and thats an error
+                        flag += 1;
                     }
-                    else if (entry.Name.EndsWith(imageNR.ToString() + ".gif"))
-                    {
-                        entry.Delete();
-                        archive.CreateEntryFromFile(image, "word\\media\\image" + imageNR.ToString() + ".gif");
-                        break; // exits the loop otherwise the collection number is changing and thats an error
-                    }
-                    else if (entry.Name.EndsWith(imageNR.ToString() + ".jpeg"))
-                    {
-                        entry.Delete();
-                        archive.CreateEntryFromFile(image, "word\\media\\image" + imageNR.ToString() + ".jpeg");
-                        break; // exits the loop otherwise the collection number is changing and thats an error
-                    }
-                    else if (entry.Name.EndsWith(imageNR.ToString() + ".jpg"))
-                    {
-                        entry.Delete();
-                        archive.CreateEntryFromFile(image, "word\\media\\image" + imageNR.ToString() + ".jpg");
-                        break; // exits the loop otherwise the collection number is changing and thats an error
-                    }
+                        //renames file to be copied in zip to the corresponding file into the zip
+                        if (entry.Name.Equals("image" + (imageNR+flag).ToString() + ".png"))
+                        //if (entry.FullName.EndsWith(imageNR.ToString() + ".png"))
+                        {
+                            entry.Delete();
+                            archive.CreateEntryFromFile(image, "word\\media\\image" + (imageNR + flag).ToString() + ".png");
+                            break; // exits the loop otherwise the collection number is changing and thats an error
+                        }
+                        else if (entry.Name.EndsWith(imageNR.ToString() + ".gif"))
+                        {
+                            entry.Delete();
+                            archive.CreateEntryFromFile(image, "word\\media\\image" + (imageNR + flag).ToString() + ".gif");
+                            break; // exits the loop otherwise the collection number is changing and thats an error
+                        }
+                        else if (entry.Name.EndsWith(imageNR.ToString() + ".jpeg"))
+                        {
+                            entry.Delete();
+                            archive.CreateEntryFromFile(image, "word\\media\\image" + (imageNR + flag).ToString() + ".jpeg");
+                            break; // exits the loop otherwise the collection number is changing and thats an error
+                        }
+                        else if (entry.Name.EndsWith(imageNR.ToString() + ".jpg"))
+                        {
+                            entry.Delete();
+                            archive.CreateEntryFromFile(image, "word\\media\\image" + (imageNR + flag).ToString() + ".jpg");
+                            break; // exits the loop otherwise the collection number is changing and thats an error
+                        }
+                    
+                    
                 }
             }
         }
