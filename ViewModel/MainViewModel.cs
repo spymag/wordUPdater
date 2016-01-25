@@ -40,6 +40,7 @@ namespace WordUpdater.ViewModel
             SelectWordFile = new RelayCommand(() => SelectWordFileExecute(), () => true);
             SaveBitmapFromClipboard = new RelayCommand(() => SaveBitmapFromClipboardExecute(), () => true);
             ShowHelp = new RelayCommand(() => ShowHelpExecute(), () => true);
+            RenameFiles = new RelayCommand(() => RenameFilesExecute(), () => true);
             ZipPath = null;
             Image = null;
             FileToReplace = "";
@@ -182,12 +183,23 @@ namespace WordUpdater.ViewModel
 
         public ICommand ShowHelp { get; set; }
 
+        public ICommand RenameFiles { get; set; }
+
 
         #endregion
 
         #region Methods
 
         #region ExecuteMethods
+
+        private void RenameFilesExecute()
+        {
+            //Check whether the paths are selected.
+            if (CheckImagepath() == false)
+            { return; }
+
+            RenameFilesMethod(ImagesPath);
+        }
 
         private void SelectImagesFolderExecute()
         {
@@ -239,6 +251,36 @@ namespace WordUpdater.ViewModel
         #endregion
 
         #region Open Files and Folder methods
+
+        private void RenameFilesMethod(string dirpath)
+        {
+            //string dirpath = @"C:\Users\spyros.magripis\Pictures\LOS_rainbow";
+            string backupDir = dirpath + @"\backup";
+            Directory.CreateDirectory(backupDir);
+            int exitValue = 9; // make room before this picture
+            DirectoryInfo d = new DirectoryInfo(dirpath);
+            FileInfo[] infos = d.GetFiles();
+            string[] backupList = Directory.GetFiles(dirpath); // make a back up list
+            int fCount = Directory.GetFiles(dirpath, "*", System.IO.SearchOption.TopDirectoryOnly).Length; //get number of files FIX IT TO GET THE LARGEST NAME OF THE FILE
+            int flag = 0;
+            // copy the pic files    
+            foreach (string f in backupList)
+            {
+                // Remove Path from the file name.
+                string fName = f.Substring(dirpath.Length + 1);
+                File.Copy(Path.Combine(dirpath, fName), Path.Combine(backupDir, fName), true);
+            }
+            foreach (FileInfo f in infos.Reverse())
+            {
+                File.Move(f.FullName, f.FullName.ToString().Replace((fCount - flag).ToString(), (fCount - flag + 1).ToString()));
+                flag += 1;
+                if (fCount - flag == exitValue - 2)
+                {
+                    break;
+                }
+            }
+        }
+
         private void OpenFolder()
         {
             var BrowseFolder = new VistaFolderBrowserDialog();
@@ -355,40 +397,40 @@ namespace WordUpdater.ViewModel
             switch (FileToReplace)
             {
                 case "":
-            int i = 0;
-            int a = 0;
+                    int i = 0;
+                    int a = 0;
 
-            //count pics in the imagespath
-            exportToBMPLib Counter = new exportToBMPLib();
+                    //count pics in the imagespath
+                    exportToBMPLib Counter = new exportToBMPLib();
 
-            foreach (string file in Directory.EnumerateFiles(ImagesPath))
-            {
-                if (Path.GetExtension(file).EndsWith(".png") || Path.GetExtension(file).EndsWith(".gif") || Path.GetExtension(file).EndsWith(".jpg") || Path.GetExtension(file).EndsWith(".bmp") || Path.GetExtension(file).EndsWith(".jpeg"))
-                {
-                    // use a Python like slice function to get an approx latest 10 chars to filter the Image numbering
-                    string Alphanumstr = PythonSlice.Slice(file, file.Length - 10, file.Length, 1); // consider changing 10 based on the length of the image file extension
-                    // get the numbers from an alphanumeric string
-                    string NumericString = System.Text.RegularExpressions.Regex.Match(Alphanumstr, @"\d+").Value;
-
-                    bool result = Int32.TryParse(NumericString, out i);
-                    if (result)
+                    foreach (string file in Directory.EnumerateFiles(ImagesPath))
                     {
-                        if (i > a) // check if the last reported value is the largest.
+                        if (Path.GetExtension(file).EndsWith(".png") || Path.GetExtension(file).EndsWith(".gif") || Path.GetExtension(file).EndsWith(".jpg") || Path.GetExtension(file).EndsWith(".bmp") || Path.GetExtension(file).EndsWith(".jpeg"))
                         {
-                            a = i;
+                            // use a Python like slice function to get an approx latest 10 chars to filter the Image numbering
+                            string Alphanumstr = PythonSlice.Slice(file, file.Length - 10, file.Length, 1); // consider changing 10 based on the length of the image file extension
+                            // get the numbers from an alphanumeric string
+                            string NumericString = System.Text.RegularExpressions.Regex.Match(Alphanumstr, @"\d+").Value;
+
+                            bool result = Int32.TryParse(NumericString, out i);
+                            if (result)
+                            {
+                                if (i > a) // check if the last reported value is the largest.
+                                {
+                                    a = i;
+                                }
+                            }
+                            else
+                            {
+                                DisplayMessage("Check the name of a file, it should end with a numeric value");
+                                return;
+                            }
                         }
                     }
-                    else
-                    {
-                        DisplayMessage("Check the name of a file, it should end with a numeric value");
-                        return;
-                    }
-                }
-            }
 
-            PicFromClipboardPath = ImagesPath + imageString + (a + 1).ToString("D3") + ".bmp";
-            Counter.exportToBMP(PicFromClipboardPath);
-            DisplayMessage("Image " + (a + 1).ToString("D3") + " created");
+                    PicFromClipboardPath = ImagesPath + imageString + (a + 1).ToString("D3") + ".bmp";
+                    Counter.exportToBMP(PicFromClipboardPath);
+                    DisplayMessage("Image " + (a + 1).ToString("D3") + " created");
                     break;
 
 
@@ -400,7 +442,7 @@ namespace WordUpdater.ViewModel
                     break;
             }
 
-            
+
         }
         #endregion
 
@@ -430,6 +472,20 @@ namespace WordUpdater.ViewModel
                 return true;
             }
         }
+
+        private bool CheckImagepath()
+        {
+            if (string.IsNullOrEmpty(ImagesPath))
+            {
+                DisplayMessage("Select the Folder containing the Images");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         private bool CheckForImagePathAndClipboard()
         {
             if (string.IsNullOrEmpty(ImagesPath))
@@ -476,7 +532,7 @@ namespace WordUpdater.ViewModel
                 foreach (ZipArchiveEntry entry in archive.Entries)
                 {
                     //renames file to be copied in zip to the corresponding file into the zip
-                    if (entry.Name.Equals("image"+imageNR.ToString() + ".png"))
+                    if (entry.Name.Equals("image" + imageNR.ToString() + ".png"))
                     //if (entry.FullName.EndsWith(imageNR.ToString() + ".png"))
                     {
                         entry.Delete();
@@ -499,6 +555,12 @@ namespace WordUpdater.ViewModel
                     {
                         entry.Delete();
                         archive.CreateEntryFromFile(image, "word\\media\\image" + imageNR.ToString() + ".jpg");
+                        break; // exits the loop otherwise the collection number is changing and thats an error
+                    }
+                    else if (entry.Name.EndsWith(imageNR.ToString() + ".epf"))
+                    {
+                        entry.Delete();
+                        archive.CreateEntryFromFile(image, "word\\media\\image" + imageNR.ToString() + ".epf");
                         break; // exits the loop otherwise the collection number is changing and thats an error
                     }
                 }
