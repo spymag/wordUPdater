@@ -1,0 +1,46 @@
+<Window x:Class="WordUPdater.Views.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Word UPdater HelpWindow" MinHeight="620" Width="300"
+        SizeToContent="Height">
+    <Window.Resources>
+        <Style x:Key="TextBoxStyle" TargetType="TextBox">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+        </Style>
+        <Style x:Key="TextBlockInstructionsStyle" TargetType="TextBox">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <StackPanel>
+            <TextBox Style="{StaticResource TextBoxStyle}" 
+                     Text="Application Made by Spyros, please contact for help or bug declaration. 
+                     &#x0a;Every feedback is appreciated. This is an Alpha version, please use with caution. Backups are created automatically.
+                     &#x0a; 
+                     &#x0a;The purpose of this application is to help you synchronize pictures in a folder with the pictures in a docx file."/>
+            
+            <TextBox Text="Instructions: " Style="{StaticResource TextBlockInstructionsStyle}" FontWeight="Bold"/>            
+            <TextBox Style="{StaticResource TextBlockInstructionsStyle}"
+                     Text="1) Select first the folder that contains the pictures you want to synchronize with a docx file.
+                     &#x0a;2)Then select the docx file you wish to update the pictures.
+                     &#x0a;3)Press the 'updatePictures' button to perfom the sync."/>
+
+            <TextBox Text="Notes: " Style="{StaticResource TextBlockInstructionsStyle}" FontWeight="Bold"/>
+            <TextBox Style="{StaticResource TextBlockInstructionsStyle}"
+                     Text="A backUp will be created the second you press the updatePictures button. The location is shown in the application's information window.
+                     &#x0a;A tool is provided to save as a bmp the current content of the clipboard. This file will be saved at the location with the pictures to be sync as defined by the user.
+                     &#x0a;The application supports mnemonics; active by pressing Alt"/>
+            <TextBox Text="Limitations: " Style="{StaticResource TextBlockInstructionsStyle}" FontWeight="Bold"/>
+            <TextBox Style="{StaticResource TextBlockInstructionsStyle}"
+                     Text="Only docx files are supported.
+                     &#x0a;Equations from older office versions(less than 2007)are not supported.
+                     &#x0a;Supported image files; Bmp, png, jpeg, jpg, gif.
+                     &#x0a;Images from the folder will be inserted into the docx file by means of alphabetical order. Be sure to keep track of the order. It is recommended to use the format 'Image001,Image002,etc'"/>
+        </StackPanel>
+    </Grid>
+</Window>
